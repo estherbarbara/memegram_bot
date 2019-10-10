@@ -3,19 +3,21 @@ const cron = require(`node-cron`);
 const TOKEN = `872713076:AAFoPDBhIO_NntSY_2-RW7kZgseT-FAjDpk`
 const bot = new TelegramBot( TOKEN, { polling: true } )
 
+bot.on("polling_error", (err) => console.log(err));
+
 var logError = function logError(msg) {
   return function (err) {
     return console.log(msg, err);
   };
 };
 
-var logSuccess = function(msg, match){
+var logSuccess = function(msg, match) {
   return function(data){
     console.log( 'Success:', data);
   };
 };
 
-var sendEcho = function(msg, match){
+var sendEcho = function(msg, match) {
   bot.sendMessage( msg.chat.id, match[ 1 ] )
       .then( logSuccess( msg, match ) )
       .catch( logError( 'Error:') );
@@ -32,14 +34,14 @@ var helloMsg = function(userName) {
   	/gimme video <hourly, daily>\r
   	/gimme gif <hourly, daily>\r
   	/gimme today <daily>\r
-  	/stop <meme, image, video, gif, today>\r`;
+  	/stop <meme, image, video, gif, today>`;
 };
 
 var userOrGroup = function(msg) {
   return msg.chat.first_name ? msg.chat.first_name : msg.chat.title;
 };
 
-var sendStart = function(msg, match){
+var sendStart = function(msg, match) {
   bot.sendMessage( msg.chat.id, helloMsg( userOrGroup(msg) ) )
   	.then( logSuccess( msg, match ) )
       .catch( logError( 'Error:') );
@@ -47,12 +49,21 @@ var sendStart = function(msg, match){
 
 bot.onText( /\/start/, sendStart);
 
-var sendMemePhoto = function(msg, match){
+var sendMemePhoto = function(msg, match) {
   bot.sendPhoto(msg.chat.id, 'https://www.ahnegao.com.br/wp-content/uploads/2019/10/lola.jpg')
   	.then( logSuccess( msg, match ) )
       .catch( logError( 'Error:') );
 };
 
-bot.onText( /\/gimme/, sendMemePhoto);
+bot.onText( /\/gimme meme/, sendMemePhoto);
 
-bot.on("polling_error", (err) => console.log(err));
+var gimmeDaily = function(msg, match) {
+  var daily = `45 20 * * *`; 
+  bot.sendMessage( msg.chat.id,`Your daily meme will be sent at ${daily}`); //todo: format date
+  cron.schedule( daily, () => { //todo: add now time if not passed any hour
+    bot.sendMessage(msg.chat.id,`Sending you daily meme, ${userOrGroup(msg)}!`);
+    //bot.sendAudio(message.chat.id,'./remindersss.ogg');
+  })
+};
+
+bot.onText( /\/gimme daily/, gimmeDaily);
