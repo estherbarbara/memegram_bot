@@ -26,7 +26,7 @@ var sendEcho = function(msg, match) {
 bot.onText( /\/echo (.*)/, sendEcho);
 
 var helloMsg = function(userName) {
-	return `Hello! ${userName}.\n
+	return `Hello, ${userName}!\n
   	You can use the following commands:\n
   	/start\r
   	/gimme meme <hourly, daily>\r
@@ -55,7 +55,7 @@ var sendMemePhoto = function(msg, match) {
       .catch( logError( 'Error:') );
 };
 
-bot.onText( /\/gimme meme/, sendMemePhoto);
+bot.onText( /\/gimme image/, sendMemePhoto);
 
 var gimmeDaily = function(msg, match) {
   var daily = `45 20 * * *`; 
@@ -67,3 +67,12 @@ var gimmeDaily = function(msg, match) {
 };
 
 bot.onText( /\/gimme daily/, gimmeDaily);
+
+
+var sendMemeVideo = function(msg, match) {
+  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/SpectacularColorfulFennecfox-mobile.mp4')
+  	.then( logSuccess( msg, match ) )
+      .catch( logError( 'Error:') );
+};
+
+bot.onText( /\/gimme video/, sendMemeVideo);
