@@ -1,3 +1,4 @@
+const axios = require('axios'); 
 const TelegramBot = require( `node-telegram-bot-api` )
 const cron = require(`node-cron`);
 const TOKEN = `872713076:AAFoPDBhIO_NntSY_2-RW7kZgseT-FAjDpk`
@@ -50,9 +51,15 @@ var sendStart = function(msg, match) {
 bot.onText( /\/start/, sendStart);
 
 var sendMemePhoto = function(msg, match) {
-  bot.sendPhoto(msg.chat.id, 'https://www.ahnegao.com.br/wp-content/uploads/2019/10/lola.jpg', {caption : "There's your meme!"})
-  	.then( logSuccess( msg, match ) )
-      .catch( logError( 'Error:') );
+  axios.get('http://1d6b2a6d.ngrok.io/photo').then(function (response) {
+      // handle success
+      console.log(response);
+      const imageLink = response.data.src;
+      const title = response.data.title;
+      bot.sendPhoto(msg.chat.id, imageLink, {caption : title})
+          .then( logSuccess( msg, match ) )
+          .catch( logError( 'Error:') );
+      });
 };
 
 bot.onText( /\/gimme image/, sendMemePhoto);
@@ -61,18 +68,24 @@ var gimmeDaily = function(msg, match) {
   var daily = `45 20 * * *`; 
   bot.sendMessage( msg.chat.id,`Your daily meme will be sent at ${daily}`); //todo: format date
   cron.schedule( daily, () => { //todo: add now time if not passed any hour
-    bot.sendMessage(msg.chat.id,`Sending you daily meme, ${userOrGroup(msg)}!`, {caption : "There's your meme!"});
+    bot.sendMessage(msg.chat.id,`Sending you daily meme, ${userOrGroup(msg)}!`);
     //bot.sendAudio(message.chat.id,'./remindersss.ogg');
   })
 };
 
-bot.onText( /\/gimme daily/, gimmeDaily);
+bot.onText( /\/gimme daily/, gimmeDaily); //todo: fix the command to get a specific format of meme
 
 
 var sendMemeVideo = function(msg, match) {
-  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/SpectacularColorfulFennecfox-mobile.mp4', {caption : "There's your video!"})
-  	.then( logSuccess( msg, match ) )
-      .catch( logError( 'Error:') );
+  axios.get('http://1d6b2a6d.ngrok.io/video').then(function (response) {
+      // handle success
+      console.log(response);
+      const videoLink = response.data.src;
+      const title = response.data.title;
+      bot.sendMessage( msg.chat.id, `${tile}:\n${videolink}` )
+  	    .then( logSuccess( msg, match ) )
+        .catch( logError( 'Error:'));
+      });
 };
 
 bot.onText( /\/gimme video/, sendMemeVideo);
