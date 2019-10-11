@@ -50,7 +50,7 @@ var sendStart = function(msg, match) {
 bot.onText( /\/start/, sendStart);
 
 var sendMemePhoto = function(msg, match) {
-  bot.sendPhoto(msg.chat.id, 'https://www.ahnegao.com.br/wp-content/uploads/2019/10/lola.jpg')
+  bot.sendPhoto(msg.chat.id, 'https://www.ahnegao.com.br/wp-content/uploads/2019/10/lola.jpg', {caption : "There's your meme!"})
   	.then( logSuccess( msg, match ) )
       .catch( logError( 'Error:') );
 };
@@ -61,7 +61,7 @@ var gimmeDaily = function(msg, match) {
   var daily = `45 20 * * *`; 
   bot.sendMessage( msg.chat.id,`Your daily meme will be sent at ${daily}`); //todo: format date
   cron.schedule( daily, () => { //todo: add now time if not passed any hour
-    bot.sendMessage(msg.chat.id,`Sending you daily meme, ${userOrGroup(msg)}!`);
+    bot.sendMessage(msg.chat.id,`Sending you daily meme, ${userOrGroup(msg)}!`, {caption : "There's your meme!"});
     //bot.sendAudio(message.chat.id,'./remindersss.ogg');
   })
 };
@@ -70,7 +70,7 @@ bot.onText( /\/gimme daily/, gimmeDaily);
 
 
 var sendMemeVideo = function(msg, match) {
-  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/SpectacularColorfulFennecfox-mobile.mp4')
+  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/SpectacularColorfulFennecfox-mobile.mp4', {caption : "There's your video!"})
   	.then( logSuccess( msg, match ) )
       .catch( logError( 'Error:') );
 };
@@ -78,7 +78,7 @@ var sendMemeVideo = function(msg, match) {
 bot.onText( /\/gimme video/, sendMemeVideo);
 
 var sendMemeGif = function(msg, match) {
-  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/DeterminedNecessaryCatfish-mobile.mp4')
+  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/DeterminedNecessaryCatfish-mobile.mp4', {caption : "There's your GIF!"})
   	.then( logSuccess( msg, match ) )
       .catch( logError( 'Error:') );
 };
