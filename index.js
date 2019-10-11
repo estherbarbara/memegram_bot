@@ -76,3 +76,11 @@ var sendMemeVideo = function(msg, match) {
 };
 
 bot.onText( /\/gimme video/, sendMemeVideo);
+
+var sendMemeGif = function(msg, match) {
+  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/DeterminedNecessaryCatfish-mobile.mp4')
+  	.then( logSuccess( msg, match ) )
+      .catch( logError( 'Error:') );
+};
+
+bot.onText( /\/gimme gif/, sendMemeGif);
