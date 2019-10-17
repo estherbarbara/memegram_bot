@@ -1,3 +1,4 @@
+const axios = require('axios'); 
 const TelegramBot = require( `node-telegram-bot-api` )
 const cron = require(`node-cron`);
 const TOKEN = `872713076:AAFoPDBhIO_NntSY_2-RW7kZgseT-FAjDpk`
@@ -26,13 +27,13 @@ var sendEcho = function(msg, match) {
 bot.onText( /\/echo (.*)/, sendEcho);
 
 var helloMsg = function(userName) {
-	return `Hello, ${userName}!\n
-  	You can use the following commands:\n
-  	/start\r
-  	/gimme meme <hourly, daily>\r
-  	/gimme image <hourly, daily>\r
-  	/gimme video <hourly, daily>\r
-  	/gimme gif <hourly, daily>\r
+	return `Olá, ${userName}!\n
+  	Você pode usar os seguintes comandos:\n
+  	/help - Lista de comandos\r
+  	/gimme meme - Um meme aleatório\r
+  	/gimme image\r
+  	/gimme video\r
+  	/gimme gif\r
   	/gimme today <daily>\r
   	/stop <meme, image, video, gif, today>`;
 };
@@ -47,40 +48,85 @@ var sendStart = function(msg, match) {
       .catch( logError( 'Error:') );
 };
 
-bot.onText( /\/start/, sendStart);
+bot.onText( /\/help/, sendStart);
 
 var sendMemePhoto = function(msg, match) {
-  bot.sendPhoto(msg.chat.id, 'https://www.ahnegao.com.br/wp-content/uploads/2019/10/lola.jpg', {caption : "There's your meme!"})
-  	.then( logSuccess( msg, match ) )
-      .catch( logError( 'Error:') );
+  axios.get('http://127.0.0.1:5000/photo').then(function (response) {
+      // handle success
+      const imageLink = response.data.src;
+      const title = response.data.title;
+      bot.sendPhoto(msg.chat.id, imageLink, {caption : title})
+          .then( logSuccess( msg, match ) )
+          .catch( logError( 'Error:') );
+      });
 };
 
 bot.onText( /\/gimme image/, sendMemePhoto);
 
-var gimmeDaily = function(msg, match) {
-  var daily = `45 20 * * *`; 
-  bot.sendMessage( msg.chat.id,`Your daily meme will be sent at ${daily}`); //todo: format date
-  cron.schedule( daily, () => { //todo: add now time if not passed any hour
-    bot.sendMessage(msg.chat.id,`Sending you daily meme, ${userOrGroup(msg)}!`, {caption : "There's your meme!"});
-    //bot.sendAudio(message.chat.id,'./remindersss.ogg');
-  })
-};
+// var gimmeDaily = function(msg, match) {
+//   var daily = `45 20 * * *`; 
+//   bot.sendMessage( msg.chat.id,`Your daily meme will be sent at ${daily}`); //todo: format date
+//   cron.schedule( daily, () => { //todo: add now time if not passed any hour
+//     bot.sendMessage(msg.chat.id,`Sending you daily meme, ${userOrGroup(msg)}!`);
+//     //bot.sendAudio(message.chat.id,'./remindersss.ogg');
+//   })
+// };
 
-bot.onText( /\/gimme daily/, gimmeDaily);
+// bot.onText( /\/gimme daily/, gimmeDaily); //todo: fix the command to get a specific format of meme
 
 
 var sendMemeVideo = function(msg, match) {
-  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/SpectacularColorfulFennecfox-mobile.mp4', {caption : "There's your video!"})
-  	.then( logSuccess( msg, match ) )
-      .catch( logError( 'Error:') );
+  axios.get('http://127.0.0.1:5000/video').then(function (response) {
+      // handle success
+      const videoLink = response.data.src;
+      const title = response.data.title;
+      bot.sendMessage( msg.chat.id, `${title}:\n${videoLink}` )
+  	    .then( logSuccess( msg, match ) )
+        .catch( logError( 'Error:'));
+      });
 };
 
 bot.onText( /\/gimme video/, sendMemeVideo);
 
 var sendMemeGif = function(msg, match) {
-  bot.sendVideo(msg.chat.id, 'https://thumbs.gfycat.com/DeterminedNecessaryCatfish-mobile.mp4', {caption : "There's your GIF!"})
-  	.then( logSuccess( msg, match ) )
-      .catch( logError( 'Error:') );
+  axios.get('http://127.0.0.1:5000/gif').then(function (response) {
+      // handle success
+      const imageLink = response.data.src;
+      const title = response.data.title;
+      bot.sendMessage(msg.chat.id, `${title}:\n${imageLink}`)
+          .then( logSuccess( msg, match ) )
+          .catch( logError( 'Error:') );
+      });
 };
 
 bot.onText( /\/gimme gif/, sendMemeGif);
+
+
+var sendMemeRandom = function(msg, match) {
+  axios.get('http://127.0.0.1:5000/meme').then(function (response) {
+      // handle success
+      const type = response.data.type;
+      console.log(type);
+      const title = response.data.title;
+      const memeLink = response.data.src;
+      switch (type) {
+        case 'images':
+          bot.sendPhoto(msg.chat.id, memeLink, {caption : title})
+            .then( logSuccess( msg, match ) )
+            .catch( logError( 'Error:'));
+          break;
+        case 'videos':
+          bot.sendMessage(msg.chat.id, `${title}:\n${memeLink}`)
+            .then( logSuccess( msg, match ) )
+            .catch( logError( 'Error:'));
+          break;
+        case 'gifs':
+          bot.sendMessage(msg.chat.id, `${title}:\n${memeLink}`)
+            .then( logSuccess( msg, match ) )
+            .catch( logError( 'Error:'));
+          break;
+      }
+  });
+};
+
+bot.onText( /\/gimme meme/, sendMemeRandom);
