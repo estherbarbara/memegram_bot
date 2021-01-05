@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/estherbarbara/memegram_bot#readme",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "node-cron": "^2.0.3",
     "node-telegram-bot-api": "^0.30.0"
   }
